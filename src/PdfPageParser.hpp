@@ -8,6 +8,15 @@
 
 #include <stack>
 
+struct TextState {
+    double character_spacing = 0.0;
+    double word_spacing = 0.0;
+    double horizontal_scaling = 0.0;
+    double leading = 0.0;
+    double font_size = 0.0;
+    double text_rise = 0.0;
+};
+
 class PdfPageParser {
 public:
     PdfPageParser(PoDoFo::PdfPage& page) : page(page) {}
@@ -16,10 +25,10 @@ public:
     void parse();
 
 private:
-
     PoDoFo::PdfPage& page;
-    std::stack<PoDoFo::PdfVariant> params;
+    std::stack<PoDoFo::PdfVariant> operands;
     bool in_text = false;
+    TextState state;
 
     enum class pdf_keyword_t : uint32_t;
 
@@ -29,6 +38,16 @@ private:
     void process_keyword(char const * keyword);
     void process_text_keyword(pdf_keyword_t keyword);
     void process_other_keyword(pdf_keyword_t keyword);
+
+    double pop_double() noexcept {
+        if (operands.size() == 0) {
+            return 0.0;
+        } else {
+            auto top = operands.top();
+            operands.pop();
+            return top.IsReal() ? top.GetReal() : 0.0;
+        }
+    }
 };
 
 #endif
