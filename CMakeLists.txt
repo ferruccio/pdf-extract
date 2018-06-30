@@ -28,6 +28,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 #find_path(SYSTEM_INCLUDE_DIR clara.hpp)
 #include_directories(${SYSTEM_INCLUDE_DIR})
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/PdfPageParser.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${PODOFO_LIBRARY} ${ZLIB_LIBRARIES} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} Threads::Threads ${OPENSSL_LIBRARIES})

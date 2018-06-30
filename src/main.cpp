@@ -6,6 +6,8 @@
 #include <podofo/podofo.h>
 #pragma clang diagnostic pop
 
+#include "PdfPageParser.hpp"
+
 using std::cout;
 using std::endl;
 using std::string;
@@ -36,7 +38,9 @@ int main(int argc, char **argv) {
             for (int pageno = 0; pageno < npages; ++pageno) {
                 auto& page = *pdf.GetPage(pageno);
                 show_page_info(page);
-                parse_tokens(page);
+                //parse_tokens(page);
+                PdfPageParser ppp(page);
+                ppp.parse();
             }
         } catch (PdfError e) {
             cout << "PDF Error: " << e.what() << endl;
