@@ -8,8 +8,6 @@
 
 #include <stack>
 
-using keyword_t = uint32_t;
-
 class PdfPageParser {
 public:
     PdfPageParser(PoDoFo::PdfPage& page) : page(page) {}
@@ -22,6 +20,11 @@ private:
     PoDoFo::PdfPage& page;
     std::stack<PoDoFo::PdfVariant> params;
     bool in_text = false;
+
+    enum class keyword_t : uint32_t;
+
+    static constexpr uint32_t s2kw(char const * s) noexcept;
+    static std::string kw2s(keyword_t keyword) noexcept;
 
     void process_keyword(char const * keyword);
     void process_text_keyword(keyword_t keyword);
