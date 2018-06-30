@@ -31,13 +31,17 @@ void PdfPageParser::parse() {
 }
 
 namespace {
-    std::string kw2s(keyword_t keyword) {
+    constexpr int byte_size = 8;
+    constexpr int byte_mask = 0xff;
+
+    std::string kw2s(keyword_t keyword) noexcept {
         std::string s;
         for (unsigned i = 0; i < sizeof(keyword_t); ++i) {
-            char ch = static_cast<char>((keyword >> 24) & 0xff);
+            constexpr int shr = byte_size * (sizeof(keyword_t) - 1);
+            char ch = static_cast<char>((keyword >> shr) & byte_mask);
             if (ch != 0)
                 s += ch;
-            keyword <<= 8;
+            keyword <<= byte_size;
         }
         return s;
     }
@@ -45,7 +49,7 @@ namespace {
     constexpr keyword_t s2kw(char const * s) noexcept {
         keyword_t kw = 0;
         for (unsigned i = 0; *s != 0 && i < sizeof(keyword_t); ++i, ++s)
-            kw = (kw << 8) | *s;
+            kw = (kw << byte_size) | *s;
         return kw;
     }
 
