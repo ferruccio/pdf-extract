@@ -21,14 +21,14 @@ private:
     std::stack<PoDoFo::PdfVariant> params;
     bool in_text = false;
 
-    enum class keyword_t : uint32_t;
+    enum class pdf_keyword_t : uint32_t;
 
     static constexpr uint32_t s2kw(char const * s) noexcept;
-    static std::string kw2s(keyword_t keyword) noexcept;
+    static std::string kw2s(pdf_keyword_t keyword) noexcept;
 
     void process_keyword(char const * keyword);
-    void process_text_keyword(keyword_t keyword);
-    void process_other_keyword(keyword_t keyword);
+    void process_text_keyword(pdf_keyword_t keyword);
+    void process_other_keyword(pdf_keyword_t keyword);
 };
 
 #endif
