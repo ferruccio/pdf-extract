@@ -1,6 +1,7 @@
 #ifndef UNITS_HPP
 #define UNITS_HPP
 
+// text space units
 class text_space_units {
 public:
     text_space_units() noexcept {}
@@ -10,7 +11,7 @@ public:
     }
 
     static text_space_units from_inches(double inches) noexcept {
-        return text_space_units(inches * 72.0);
+        return from_units(inches * 72.0);
     }
 
     double to_double() noexcept {
@@ -18,7 +19,7 @@ public:
     }
 
 private:
-    text_space_units(double units) noexcept : units(units) {}
+    explicit text_space_units(double units) noexcept : units(units) {}
 
     double units = 0.0; // unscaled text-space units
 };
@@ -28,6 +29,34 @@ inline std::ostream& operator<<(std::ostream& os, text_space_units units) {
     return os;
 }
 
+// text space milliunits
+class text_space_milliunits {
+public:
+    text_space_milliunits() {}
+
+    static text_space_milliunits from_milliunits(double milliunits) noexcept {
+        return text_space_milliunits(milliunits);
+    }
+
+    static text_space_milliunits from_units(text_space_units units) noexcept {
+        return from_milliunits(units.to_double() * 1000.0);
+    }
+
+    double to_double() noexcept {
+        return milliunits;
+    }
+
+private:
+    explicit text_space_milliunits(double milliunits) noexcept : milliunits(milliunits) {}
+    double milliunits = 0.0; // 1/1000ths of a text-space unit
+};
+
+inline std::ostream& operator<<(std::ostream& os, text_space_milliunits milliunits) {
+    os << milliunits.to_double() << "tsmu";
+    return os;
+}
+
+// percentage
 class percentage {
 public:
     percentage() noexcept {}
@@ -45,7 +74,7 @@ public:
     }
 
 private:
-    percentage(double percent) noexcept : percent(percent) {}
+    explicit percentage(double percent) noexcept : percent(percent) {}
 
     double percent = 0.0;
 };

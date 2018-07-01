@@ -6,9 +6,17 @@
 #include <podofo/podofo.h>
 #pragma clang diagnostic pop
 
-#include <stack>
 #include <iostream>
+#include <stack>
+#include <unordered_map>
+#include <vector>
 #include "units.hpp"
+
+struct FontInfo {
+    long first_char = 0;
+    long last_char = 0;
+    std::vector<text_space_milliunits> widths;
+};
 
 struct TextState {
     bool in_text = false;
@@ -18,6 +26,8 @@ struct TextState {
     text_space_units leading;
     text_space_units font_size;
     text_space_units text_rise;
+    double font_scale = 1.0;
+    FontInfo const* current_font = nullptr;
 };
 
 class PdfPageParser {
@@ -33,6 +43,7 @@ private:
 
     std::stack<PoDoFo::PdfVariant> operands;
     TextState state;
+    std::unordered_map<std::string, FontInfo> fonts;
 
     enum class pdf_keyword_t : uint32_t;
 
@@ -43,6 +54,20 @@ private:
     void process_string();
     void process_strings();
     void select_font();
+
+    static double var2n(PoDoFo::PdfVariant const& v) {
+        if (v.IsReal()) return v.GetReal();
+        if (v.IsNumber()) return v.GetNumber();
+        return 0.0;
+    }
+
+    static long var2long(PoDoFo::PdfVariant const& v) {
+        return v.IsNumber() ? v.GetNumber() : 0;
+    }
+
+    static long var2long(PoDoFo::PdfVariant const* v) {
+        return v != nullptr && v->IsNumber() ? v->GetNumber() : 0;
+    }
 
     PoDoFo::PdfVariant pop() noexcept {
         if (operands.size() == 0) {
@@ -55,10 +80,7 @@ private:
     }
 
     double pop_n() noexcept {
-        auto top = pop();
-        if (top.IsReal()) return top.GetReal();
-        if (top.IsNumber()) return top.GetNumber();
-        return 0.0;
+        return var2n(pop());
     }
 
     text_space_units pop_ts_units() noexcept {
@@ -75,6 +97,8 @@ private:
     }
 };
 
+// useful for debugging
+
 inline std::ostream& operator<<(std::ostream& os, TextState const& ts) {
     os << "TS[cs=" << ts.character_spacing
         << " ws=" << ts.word_spacing
@@ -86,7 +110,16 @@ inline std::ostream& operator<<(std::ostream& os, TextState const& ts) {
     return os;
 }
 
-// useful for debugging
+inline std::ostream& operator<<(std::ostream& os, FontInfo const& fi) {
+    os << "FI[f=" << fi.first_char
+        << " l=" << fi.last_char
+        << " w=(";
+    for (const auto& w : fi.widths) {
+        os << w << ' ';
+    }
+    os << ")]";
+    return os;
+}
 
 #define PODOFO_OUTPUT_OPERATOR(type) \
 inline std::ostream& operator<<(std::ostream& os, PoDoFo::type const& t) { \

@@ -124,6 +124,42 @@ void PdfPageParser::process_strings() {
 }
 
 void PdfPageParser::select_font() {
-    double scale = pop_n();
+    state.font_scale = pop_n();
     std::string name = pop_name();
+
+    auto iter = fonts.find(name);
+    if (iter != fonts.end()) {
+        state.current_font = &iter->second;
+        return;
+    }
+
+    auto resources = page.GetResources();
+    if (resources == nullptr) return;
+    auto page_dict = resources->GetDictionary();
+    auto fontkey = page_dict.GetKey("Font");
+    if (fontkey == nullptr) return;
+    auto font_dict = fontkey->GetDictionary();
+    auto fontnamekey = font_dict.GetKey(name);
+    if (fontnamekey == nullptr) return;
+    auto fontref = pdf.GetObjects()->GetObject(fontnamekey->GetReference());
+    if (fontref == nullptr) return;
+    auto fontref_dict = fontref->GetDictionary();
+    auto first_char_var = fontref_dict.GetKey("FirstChar");
+    auto last_char_var = fontref_dict.GetKey("LastChar");
+    auto widths_var = fontref_dict.GetKey("Widths");
+    if (first_char_var == nullptr || last_char_var == nullptr || widths_var == nullptr) {
+        state.current_font = nullptr;
+    } else {
+        FontInfo font_info;
+        font_info.first_char = var2long(first_char_var);
+        font_info.last_char = var2long(last_char_var);
+        auto widths = widths_var->GetArray();
+        for (const auto wt : widths) {
+            auto width = text_space_milliunits::from_milliunits(var2n(wt));
+            font_info.widths.push_back(width);
+        }
+        fonts[name] = font_info;
+        auto iter = fonts.find(name);
+        state.current_font = &iter->second;
+    }
 }
