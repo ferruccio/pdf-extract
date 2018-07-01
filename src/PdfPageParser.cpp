@@ -96,22 +96,53 @@ void PdfPageParser::process_keyword(char const * keyword) {
 
 void PdfPageParser::process_text_keyword(pdf_keyword_t keyword) {
     switch (keyword) {
-        case pdf_keyword_t::Tc: state.character_spacing = pop_double(); break;
-        case pdf_keyword_t::Tw: state.word_spacing = pop_double(); break;
-        case pdf_keyword_t::Ts: state.text_rise = pop_double(); break;
-        case pdf_keyword_t::Tz: state.horizontal_scaling = pop_double(); break;
+        case pdf_keyword_t::Tc: state.character_spacing = pop_real(); break;
+        case pdf_keyword_t::Tw: state.word_spacing = pop_real(); break;
+        case pdf_keyword_t::Ts: state.text_rise = pop_real(); break;
+        case pdf_keyword_t::Tz: state.horizontal_scaling = pop_real(); break;
         case pdf_keyword_t::Td: break;
-        case pdf_keyword_t::TL: state.leading = pop_double(); break;
+        case pdf_keyword_t::TL: state.leading = pop_real(); break;
         case pdf_keyword_t::TD: break;
         case pdf_keyword_t::Tstar: break;
         case pdf_keyword_t::Tm: break;
-        case pdf_keyword_t::Tj: break;
-        case pdf_keyword_t::TJ: break;
+        case pdf_keyword_t::Tj: process_string(); break;
+        case pdf_keyword_t::TJ: process_strings(); break;
         case pdf_keyword_t::Tf: break;
         case pdf_keyword_t::Tr: break;
         case pdf_keyword_t::apos: break;
         case pdf_keyword_t::quot: break;
         default: break;
+    }
+}
+
+void PdfPageParser::process_string() {
+    auto var = pop();
+    switch (var.GetDataType()) {
+        case ePdfDataType_String:
+        case ePdfDataType_HexString: {
+            auto str = var.GetString().GetStringUtf8();
+            break;
+        }
+        default: break;
+    }
+}
+
+void PdfPageParser::process_strings() {
+    auto var = pop();
+    if (var.IsArray()) {
+        for (auto& item : var.GetArray()) {
+            switch (item.GetDataType()) {
+                case ePdfDataType_String:
+                case ePdfDataType_HexString: {
+                    auto str = item.GetString().GetStringUtf8();;
+                    break;
+                }
+                case ePdfDataType_Number: {
+                    long n = item.GetNumber();
+                }
+                default: break;
+            }
+        }
     }
 }
 

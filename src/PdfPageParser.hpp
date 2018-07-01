@@ -38,15 +38,22 @@ private:
     void process_keyword(char const * keyword);
     void process_text_keyword(pdf_keyword_t keyword);
     void process_other_keyword(pdf_keyword_t keyword);
+    void process_string();
+    void process_strings();
 
-    double pop_double() noexcept {
+    PoDoFo::PdfVariant pop() noexcept {
         if (operands.size() == 0) {
-            return 0.0;
+            return PoDoFo::PdfVariant();
         } else {
             auto top = operands.top();
             operands.pop();
-            return top.IsReal() ? top.GetReal() : 0.0;
+            return top;
         }
+    }
+
+    double pop_real() noexcept {
+        auto top = pop();
+        return top.IsReal() ? top.GetReal() : 0.0;
     }
 };
 
