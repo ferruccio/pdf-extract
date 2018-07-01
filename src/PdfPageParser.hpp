@@ -9,9 +9,10 @@
 #include <stack>
 
 struct TextState {
+    bool in_text = false;
     double character_spacing = 0.0;
     double word_spacing = 0.0;
-    double horizontal_scaling = 0.0;
+    double horizontal_scaling = 100.0;
     double leading = 0.0;
     double font_size = 0.0;
     double text_rise = 0.0;
@@ -27,7 +28,6 @@ public:
 private:
     PoDoFo::PdfPage& page;
     std::stack<PoDoFo::PdfVariant> operands;
-    bool in_text = false;
     TextState state;
 
     enum class pdf_keyword_t : uint32_t;
@@ -36,8 +36,6 @@ private:
     static std::string kw2s(pdf_keyword_t keyword) noexcept;
 
     void process_keyword(char const * keyword);
-    void process_text_keyword(pdf_keyword_t keyword);
-    void process_other_keyword(pdf_keyword_t keyword);
     void process_string();
     void process_strings();
 

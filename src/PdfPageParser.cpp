@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& os, TextState const& ts) {
 
 
 void PdfPageParser::parse() {
-    in_text = false;
+    state.in_text = false;
     PdfContentsTokenizer tok(&page);
     char const * token = nullptr;
     PdfVariant var;
@@ -57,6 +57,9 @@ std::string PdfPageParser::kw2s(pdf_keyword_t keyword) noexcept {
     return s;
 }
 
+// Compile-time conversion of a character string to pdf keyword type.
+// This is a perfect hash as long as keywords are no longer than the number
+// of bytes in an uint_32_t (nominally: 4 bytes).
 constexpr uint32_t PdfPageParser::s2kw(char const * s) noexcept {
     uint32_t kw = 0;
     for (unsigned nch = 0; *s != 0 && nch < sizeof(pdf_keyword_t); ++nch, ++s)
@@ -78,24 +81,10 @@ enum class PdfPageParser::pdf_keyword_t : uint32_t {
 void PdfPageParser::process_keyword(char const * keyword) {
     pdf_keyword_t kw = static_cast<pdf_keyword_t>(s2kw(keyword));
     switch (kw) {
-        case pdf_keyword_t::BT:
-            in_text = true;
-            break;
-        case pdf_keyword_t::ET:
-            in_text = false;
-            break;
-        default:
-            if (in_text) {
-                process_text_keyword(kw);
-            } else {
-                process_other_keyword(kw);
-            }
-            break;
-    }
-}
-
-void PdfPageParser::process_text_keyword(pdf_keyword_t keyword) {
-    switch (keyword) {
+        // begin/end text
+        case pdf_keyword_t::BT: state.in_text = true; break;
+        case pdf_keyword_t::ET: state.in_text = false; break;
+        // text operators
         case pdf_keyword_t::Tc: state.character_spacing = pop_real(); break;
         case pdf_keyword_t::Tw: state.word_spacing = pop_real(); break;
         case pdf_keyword_t::Ts: state.text_rise = pop_real(); break;
@@ -134,20 +123,15 @@ void PdfPageParser::process_strings() {
             switch (item.GetDataType()) {
                 case ePdfDataType_String:
                 case ePdfDataType_HexString: {
-                    auto str = item.GetString().GetStringUtf8();;
+                    auto str = item.GetString().GetStringUtf8();
                     break;
                 }
                 case ePdfDataType_Number: {
                     long n = item.GetNumber();
+                    break;
                 }
                 default: break;
             }
         }
-    }
-}
-
-void PdfPageParser::process_other_keyword(pdf_keyword_t keyword) {
-    switch (keyword) {
-        default: break;
     }
 }
