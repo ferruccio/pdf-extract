@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
                 auto& page = *pdf.GetPage(pageno);
                 show_page_info(page);
                 //parse_tokens(page);
-                PdfPageParser ppp(page);
+                PdfPageParser ppp(pdf, page);
                 ppp.parse();
             }
         } catch (PdfError e) {

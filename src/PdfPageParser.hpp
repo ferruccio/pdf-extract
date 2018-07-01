@@ -7,6 +7,7 @@
 #pragma clang diagnostic pop
 
 #include <stack>
+#include <iostream>
 #include "units.hpp"
 
 struct TextState {
@@ -21,13 +22,15 @@ struct TextState {
 
 class PdfPageParser {
 public:
-    PdfPageParser(PoDoFo::PdfPage& page) : page(page) {}
+    PdfPageParser(PoDoFo::PdfDocument& pdf, PoDoFo::PdfPage& page) : pdf(pdf), page(page) {}
     virtual ~PdfPageParser() {}
 
     void parse();
 
 private:
+    PoDoFo::PdfDocument& pdf;
     PoDoFo::PdfPage& page;
+
     std::stack<PoDoFo::PdfVariant> operands;
     TextState state;
 
@@ -71,5 +74,55 @@ private:
         return top.IsName() ? top.GetName().GetName() : std::string("");
     }
 };
+
+inline std::ostream& operator<<(std::ostream& os, TextState const& ts) {
+    os << "TS[cs=" << ts.character_spacing
+        << " ws=" << ts.word_spacing
+        << " hs=" << ts.horizontal_scaling
+        << " ld=" << ts.leading
+        << " fs=" << ts.font_size
+        << " tr=" << ts.text_rise
+        << "]";
+    return os;
+}
+
+// useful for debugging
+
+#define PODOFO_OUTPUT_OPERATOR(type) \
+inline std::ostream& operator<<(std::ostream& os, PoDoFo::type const& t) { \
+    std::string s; \
+    t.ToString(s); \
+    os << s; \
+    return os; \
+} \
+inline std::ostream& operator<<(std::ostream& os, PoDoFo::type const* t) { \
+    os << *t; \
+    return os; \
+} \
+
+PODOFO_OUTPUT_OPERATOR(PdfObject)
+PODOFO_OUTPUT_OPERATOR(PdfVariant)
+
+// these don't have a ToString method so cast them to PdfVariants
+
+#undef PODOFO_OUTPUT_OPERATOR
+#define PODOFO_OUTPUT_OPERATOR(type) \
+inline std::ostream& operator<<(std::ostream& os, PoDoFo::type const& t) { \
+    os << PoDoFo::PdfVariant(t); \
+    return os; \
+} \
+inline std::ostream& operator<<(std::ostream& os, PoDoFo::type const* t) { \
+    os << PoDoFo::PdfVariant(*t); \
+    return os; \
+} \
+
+PODOFO_OUTPUT_OPERATOR(PdfString)
+PODOFO_OUTPUT_OPERATOR(PdfName)
+PODOFO_OUTPUT_OPERATOR(PdfReference)
+PODOFO_OUTPUT_OPERATOR(PdfArray)
+PODOFO_OUTPUT_OPERATOR(PdfDictionary)
+PODOFO_OUTPUT_OPERATOR(PdfData)
+
+#undef PODOFO_OUTPUT_OPERATOR
 
 #endif

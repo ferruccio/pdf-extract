@@ -1,23 +1,11 @@
 #include "PdfPageParser.hpp"
 
 #include <iostream>
-
 #include <string>
 
 #pragma clang diagnostic ignored "-Wunused-const-variable"
 
 using namespace PoDoFo;
-
-std::ostream& operator<<(std::ostream& os, TextState const& ts) {
-    os << "TS[cs=" << ts.character_spacing
-        << " ws=" << ts.word_spacing
-        << " hs=" << ts.horizontal_scaling
-        << " ld=" << ts.leading
-        << " fs=" << ts.font_size
-        << " tr=" << ts.text_rise
-        << "]";
-    return os;
-}
 
 void PdfPageParser::parse() {
     state.in_text = false;
@@ -138,5 +126,4 @@ void PdfPageParser::process_strings() {
 void PdfPageParser::select_font() {
     double scale = pop_n();
     std::string name = pop_name();
-    //std::cout << name << "*" << scale << " ";
 }
