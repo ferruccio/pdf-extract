@@ -19,7 +19,6 @@ std::ostream& operator<<(std::ostream& os, TextState const& ts) {
     return os;
 }
 
-
 void PdfPageParser::parse() {
     state.in_text = false;
     PdfContentsTokenizer tok(&page);
@@ -85,12 +84,12 @@ void PdfPageParser::process_keyword(char const * keyword) {
         case pdf_keyword_t::BT: state.in_text = true; break;
         case pdf_keyword_t::ET: state.in_text = false; break;
         // text operators
-        case pdf_keyword_t::Tc: state.character_spacing = pop_real(); break;
-        case pdf_keyword_t::Tw: state.word_spacing = pop_real(); break;
-        case pdf_keyword_t::Ts: state.text_rise = pop_real(); break;
-        case pdf_keyword_t::Tz: state.horizontal_scaling = pop_real(); break;
+        case pdf_keyword_t::Tc: state.character_spacing = pop_ts_units(); break;
+        case pdf_keyword_t::Tw: state.word_spacing = pop_ts_units(); break;
+        case pdf_keyword_t::Ts: state.text_rise = pop_ts_units(); break;
+        case pdf_keyword_t::Tz: state.horizontal_scaling = pop_percentage(); break;
         case pdf_keyword_t::Td: break;
-        case pdf_keyword_t::TL: state.leading = pop_real(); break;
+        case pdf_keyword_t::TL: state.leading = pop_ts_units(); break;
         case pdf_keyword_t::TD: break;
         case pdf_keyword_t::Tstar: break;
         case pdf_keyword_t::Tm: break;

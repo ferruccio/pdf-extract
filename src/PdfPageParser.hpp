@@ -7,15 +7,16 @@
 #pragma clang diagnostic pop
 
 #include <stack>
+#include "units.hpp"
 
 struct TextState {
     bool in_text = false;
-    double character_spacing = 0.0;
-    double word_spacing = 0.0;
-    double horizontal_scaling = 100.0;
-    double leading = 0.0;
-    double font_size = 0.0;
-    double text_rise = 0.0;
+    percentage horizontal_scaling = percentage::from_double(100.0);
+    text_space_units character_spacing;
+    text_space_units word_spacing;
+    text_space_units leading;
+    text_space_units font_size;
+    text_space_units text_rise;
 };
 
 class PdfPageParser {
@@ -52,6 +53,14 @@ private:
     double pop_real() noexcept {
         auto top = pop();
         return top.IsReal() ? top.GetReal() : 0.0;
+    }
+
+    text_space_units pop_ts_units() noexcept {
+        return text_space_units::from_units(pop_real());
+    }
+
+    percentage pop_percentage() noexcept {
+        return percentage::from_double(pop_real());
     }
 };
 
