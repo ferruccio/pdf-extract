@@ -24,7 +24,7 @@ private:
 };
 
 inline std::ostream& operator<<(std::ostream& os, text_space_units units) {
-    os << units.to_double();
+    os << units.to_double() << "tsu";
     return os;
 }
 
@@ -38,6 +38,10 @@ public:
 
     double to_double() noexcept {
         return percent;
+    }
+
+    double percent_of(double source) noexcept {
+        return source * (percent / 100.0);
     }
 
 private:
