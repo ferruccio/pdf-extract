@@ -111,13 +111,13 @@ inline std::ostream& operator<<(std::ostream& os, TextState const& ts) {
 }
 
 inline std::ostream& operator<<(std::ostream& os, FontInfo const& fi) {
-    os << "FI[f=" << fi.first_char
+    os << "FI[ f=" << fi.first_char
         << " l=" << fi.last_char
-        << " w=(";
+        << " w=";
     for (const auto& w : fi.widths) {
         os << w << ' ';
     }
-    os << ")]";
+    os << "]";
     return os;
 }
 

@@ -25,7 +25,7 @@ private:
 };
 
 inline std::ostream& operator<<(std::ostream& os, text_space_units units) {
-    os << units.to_double() << "tsu";
+    os << units.to_double() << "u";
     return os;
 }
 
@@ -52,7 +52,7 @@ private:
 };
 
 inline std::ostream& operator<<(std::ostream& os, text_space_milliunits milliunits) {
-    os << milliunits.to_double() << "tsmu";
+    os << milliunits.to_double() << "mu";
     return os;
 }
 

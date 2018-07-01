@@ -159,7 +159,6 @@ void PdfPageParser::select_font() {
             font_info.widths.push_back(width);
         }
         fonts[name] = font_info;
-        auto iter = fonts.find(name);
-        state.current_font = &iter->second;
+        state.current_font = &fonts.find(name)->second;
     }
 }
