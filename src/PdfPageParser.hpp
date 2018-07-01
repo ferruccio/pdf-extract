@@ -39,6 +39,7 @@ private:
     void process_keyword(char const * keyword);
     void process_string();
     void process_strings();
+    void select_font();
 
     PoDoFo::PdfVariant pop() noexcept {
         if (operands.size() == 0) {
@@ -50,17 +51,24 @@ private:
         }
     }
 
-    double pop_real() noexcept {
+    double pop_n() noexcept {
         auto top = pop();
-        return top.IsReal() ? top.GetReal() : 0.0;
+        if (top.IsReal()) return top.GetReal();
+        if (top.IsNumber()) return top.GetNumber();
+        return 0.0;
     }
 
     text_space_units pop_ts_units() noexcept {
-        return text_space_units::from_units(pop_real());
+        return text_space_units::from_units(pop_n());
     }
 
     percentage pop_percentage() noexcept {
-        return percentage::from_double(pop_real());
+        return percentage::from_double(pop_n());
+    }
+
+    std::string pop_name() noexcept {
+        auto top = pop();
+        return top.IsName() ? top.GetName().GetName() : std::string("");
     }
 };
 

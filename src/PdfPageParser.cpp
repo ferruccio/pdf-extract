@@ -95,7 +95,7 @@ void PdfPageParser::process_keyword(char const * keyword) {
         case pdf_keyword_t::Tm: break;
         case pdf_keyword_t::Tj: process_string(); break;
         case pdf_keyword_t::TJ: process_strings(); break;
-        case pdf_keyword_t::Tf: break;
+        case pdf_keyword_t::Tf: select_font(); break;
         case pdf_keyword_t::Tr: break;
         case pdf_keyword_t::apos: break;
         case pdf_keyword_t::quot: break;
@@ -133,4 +133,10 @@ void PdfPageParser::process_strings() {
             }
         }
     }
+}
+
+void PdfPageParser::select_font() {
+    double scale = pop_n();
+    std::string name = pop_name();
+    //std::cout << name << "*" << scale << " ";
 }
