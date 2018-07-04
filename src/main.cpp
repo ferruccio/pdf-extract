@@ -15,17 +15,7 @@ using std::ostream;
 
 using namespace PoDoFo;
 
-ostream& operator<<(ostream& os, PdfRect const& rect) {
-    os << "[(" << rect.GetLeft()
-        << "," << rect.GetBottom()
-        << ") w: " << rect.GetWidth()
-        << " h: " << rect.GetHeight()
-        << "]";
-    return os;
-}
-
 void show_page_info(PdfPage& page);
-void parse_tokens(PdfPage& page);
 
 int main(int argc, char **argv) {
     PoDoFo::PdfError::EnableDebug(true);
@@ -38,7 +28,6 @@ int main(int argc, char **argv) {
             for (int pageno = 0; pageno < npages; ++pageno) {
                 auto& page = *pdf.GetPage(pageno);
                 show_page_info(page);
-                //parse_tokens(page);
                 PdfPageParser ppp(pdf, page);
                 ppp.parse();
             }
@@ -46,6 +35,15 @@ int main(int argc, char **argv) {
             cout << "PDF Error: " << e.what() << endl;
         }
     }
+}
+
+ostream& operator<<(ostream& os, PdfRect const& rect) {
+    os << "[(" << rect.GetLeft()
+        << "," << rect.GetBottom()
+        << ") w: " << rect.GetWidth()
+        << " h: " << rect.GetHeight()
+        << "]";
+    return os;
 }
 
 void show_page_info(PdfPage& page) {
@@ -59,30 +57,4 @@ void show_page_info(PdfPage& page) {
     cout << "\n    rotation: " << page.GetRotation();
     cout << "\n    fields: " << page.GetNumFields();
     cout << "\n";
-}
-
-void parse_tokens(PdfPage& page) {
-    cout << "\n    contents: ";
-    PdfContentsTokenizer tok(&page);
-    char const * token = nullptr;
-    PdfVariant var;
-    EPdfContentsType type;
-    while (tok.ReadNext(type, token, var)) {
-        switch (type) {
-            case ePdfContentsType_Keyword:
-                cout << token << ' ';
-                break;
-            case ePdfContentsType_Variant: {
-                string str;
-                var.ToString(str, ePdfWriteMode_Compact);
-                cout << str << ' ';
-                break;
-            }
-            case ePdfContentsType_ImageData:
-                break;
-            default:
-                break;
-        }
-    }
-    cout << '\n';
 }
