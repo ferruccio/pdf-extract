@@ -35,6 +35,8 @@ public:
     PdfPageParser(PoDoFo::PdfDocument& pdf, PoDoFo::PdfPage& page) : pdf(pdf), page(page) {}
     virtual ~PdfPageParser() {}
 
+    static constexpr uint32_t s2kw(char const * s) noexcept;
+
     void parse();
 
 private:
@@ -47,7 +49,6 @@ private:
 
     enum class pdf_keyword_t : uint32_t;
 
-    static constexpr uint32_t s2kw(char const * s) noexcept;
     static std::string kw2s(pdf_keyword_t keyword) noexcept;
 
     void process_keyword(char const * keyword);
