@@ -1,10 +1,7 @@
 #include <iostream>
 #include <string>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <podofo/podofo.h>
-#pragma clang diagnostic pop
 
 #include "PdfPageParser.hpp"
 
@@ -31,7 +28,7 @@ int main(int argc, char **argv) {
                 PdfPageParser ppp(pdf, page);
                 ppp.parse();
             }
-        } catch (PdfError e) {
+        } catch (PdfError& e) {
             cout << "PDF Error: " << e.what() << endl;
         }
     }

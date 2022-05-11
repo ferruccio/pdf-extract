@@ -1,10 +1,7 @@
 #ifndef PDF_PAGE_PARSER_HPP
 #define PDF_PAGE_PARSER_HPP
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <podofo/podofo.h>
-#pragma clang diagnostic pop
 
 #include <iostream>
 #include <stack>

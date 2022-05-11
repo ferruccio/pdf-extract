@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string>
 
-#pragma clang diagnostic ignored "-Wunused-const-variable"
-
 using namespace PoDoFo;
 
 void PdfPageParser::parse() {
@@ -114,7 +112,7 @@ void PdfPageParser::process_strings() {
                     break;
                 }
                 case ePdfDataType_Number: {
-                    long n = item.GetNumber();
+                    item.GetNumber();
                     break;
                 }
                 default: break;
@@ -154,7 +152,7 @@ void PdfPageParser::select_font() {
         font_info.first_char = var2long(first_char_var);
         font_info.last_char = var2long(last_char_var);
         auto widths = widths_var->GetArray();
-        for (const auto wt : widths) {
+        for (const auto& wt : widths) {
             auto width = text_space_milliunits::from_milliunits(var2n(wt));
             font_info.widths.push_back(width);
         }
